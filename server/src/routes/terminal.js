@@ -51,15 +51,45 @@ router.post(
 );
 
 router.post("/", async (req, res) => {
+<<<<<<< HEAD
   const docker = req.app.get("docker");
   const result = await docker.createDefaultTerminal("ubuntu");
 
   if (!result) {
     res.status(400).json({ message: "not created terminal" });
     return;
+=======
+  try {
+    const docker = req.app.get("docker");
+    const result = await terminalController.createDefaultTerminal(
+      docker,
+      "ubuntu"
+    );
+
+    if (!result) {
+      res.status(400).json({ message: "not created terminal" });
+      return;
+    }
+    res.status(201).json({ containerId: result });
+    return;
+  } catch (error) {
+    res.json(error);
+>>>>>>> 9564dc2... Feat: 터미널 실행
   }
 
   res.status(201).json({ containerId: result });
 });
 
+router.patch("/", async (req, res) => {
+  try {
+    const docker = req.app.get("docker");
+    const { containerId } = req.body;
+    const result = await terminalController.terminalStart(docker, containerId);
+
+    res.status(201).json({ containerId: result });
+  } catch (error) {
+    // HTTP STATUS CODE 409 mean conflict
+    res.status(409).json(error);
+  }
+});
 module.exports = router;
